@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생용 | 엘니뇨와 지구 환경 탐구 학습 플랫폼</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- External Libraries for Excel Parsing & Data Visualization -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        notion: {
+                            bg: '#fbfbfa',
+                            sidebar: '#f7f6f3',
+                            card: '#ffffff',
+                            border: '#e9e9e7',
+                            textPrimary: '#37352f',
+                            textSecondary: '#787774',
+                            hover: '#efefe0',
+                            blueBg: '#eef3f8',
+                            blueText: '#205d9e',
+                            orangeBg: '#fbecdd',
+                            orangeText: '#d9730d',
+                            greenBg: '#edf3ec',
+                            greenText: '#448361',
+                            redBg: '#fdebec',
+                            redText: '#d44c47',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans KR', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #fbfbfa;
+            color: #37352f;
+            font-family: 'Noto Sans KR', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+        .notion-callout {
+            background-color: #f1f1ef;
+            border-radius: 6px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .notion-card {
+            background: #ffffff;
+            border: 1px solid #e9e9e7;
+            border-radius: 8px;
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+        .notion-card:hover {
+            box-shadow: 0 4px 12px rgba(15, 15, 15, 0.05);
+        }
+        .tab-button.active {
+            border-bottom: 2px solid #37352f;
+            color: #37352f;
+            font-weight: 600;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1ef;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d3d3d0;
+            border-radius: 3px;
+        }
+        canvas {
+            touch-action: none;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <header class="sticky top-0 z-50 bg-[#fbfbfa]/90 backdrop-blur-md border-b border-notion-border px-4 py-2.5">
+        <div class="max-w-6xl mx-auto flex items-center justify-between">
+            <div class="flex items-center space-x-2 text-sm text-notion-textSecondary">
+                <span class="hover:bg-notion-hover px-2 py-1 rounded cursor-pointer transition"><i class="fa-solid fa-graduation-cap mr-1 text-blue-500"></i> 고1 지구과학</span>
+                <span>/</span>
+                <span class="text-notion-textPrimary font-medium truncate max-w-[200px] sm:max-w-none">🌊 엘니뇨와 지구 환경 탐구 (학생용)</span>
+            </div>
+            <div class="flex items-center space-x-3 text-xs">
+                <span class="px-2.5 py-1 rounded-full bg-notion-blueBg text-notion-blueText font-medium">학생 탐구 공간</span>
+                <button onclick="scrollToReport()" class="hidden sm:inline-flex items-center gap-1 bg-[#37352f] hover:bg-[#252420] text-white px-3 py-1.5 rounded text-xs transition shadow-sm">
+                    <i class="fa-solid fa-paper-plane text-[10px]"></i> 보고서 제출하기
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-6 w-full flex-grow">
+
+        <div class="mb-8">
+            <div class="text-5xl sm:text-6xl mb-3 select-none">🌏</div>
+            <h1 class="text-3xl sm:text-4xl font-bold tracking-tight text-notion-textPrimary mb-2">
+                엘니뇨가 지구 환경과 생태계에 미치는 영향
+            </h1>
+            <p class="text-notion-textSecondary text-sm sm:text-base leading-relaxed">
+                해양과 대기의 상호작용 및 무역풍 변화에 따른 동·서태평양 환경 변화 시뮬레이션 및 데이터 분석 탐구
+            </p>
+
+            <div class="notion-callout mt-4 text-sm border border-[#e3e3e0]">
+                <div class="text-xl">💡</div>
+                <div class="flex-1">
+                    <div class="font-semibold text-notion-textPrimary mb-0.5">학생 탐구 안내</div>
+                    <p class="text-notion-textSecondary leading-normal">
+                        무역풍 시뮬레이터를 활용해 바람 세기에 따른 태평양 수온 및 대기 순환을 관찰하고, 데이터 수집·분석을 거쳐 탐구 보고서를 작성한 후 제출해 주세요.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-b border-notion-border mb-6 flex overflow-x-auto space-x-1 sm:space-x-6 text-sm text-notion-textSecondary font-medium no-scrollbar">
+            <button onclick="switchTab('main')" id="tab-main" class="tab-button active pb-2.5 px-2 whitespace-nowrap transition flex items-center gap-1.5">
+                <span>📌</span> 메인 & 공지
+            </button>
+            <button onclick="switchTab('guide')" id="tab-guide" class="tab-button pb-2.5 px-2 whitespace-nowrap transition flex items-center gap-1.5">
+                <span>📋</span> 탐구 가이드
+            </button>
+            <button onclick="switchTab('sim')" id="tab-sim" class="tab-button pb-2.5 px-2 whitespace-nowrap transition flex items-center gap-1.5">
+                <span>🧪</span> 무역풍 시뮬레이터
+            </button>
+            <button onclick="switchTab('resources')" id="tab-resources" class="tab-button pb-2.5 px-2 whitespace-nowrap transition flex items-center gap-1.5">
+                <span>📚</span> 학습 자료실
+            </button>
+            <button onclick="switchTab('submit')" id="tab-submit" class="tab-button pb-2.5 px-2 whitespace-nowrap transition flex items-center gap-1.5">
+                <span>✍️</span> 과제 제출 & 게시판
+            </button>
+        </div>
+
+        <section id="content-main" class="space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="notion-card p-4 md:col-span-2">
+                    <div class="flex items-center justify-between mb-3">
+                        <h2 class="font-bold text-lg text-notion-textPrimary flex items-center gap-2">
+                            <span>📢</span> 탐구 수업 공지사항
+                        </h2>
+                        <span class="text-xs text-notion-textSecondary">최신 업데이트: 2026.07.25</span>
+                    </div>
+                    <ul class="space-y-2.5 text-sm">
+                        <li class="flex items-start gap-2 p-2 hover:bg-notion-sidebar rounded transition cursor-pointer">
+                            <span class="text-xs bg-notion-orangeBg text-notion-orangeText px-2 py-0.5 rounded font-medium mt-0.5">필독</span>
+                            <div>
+                                <p class="font-medium text-notion-textPrimary">무역풍 시뮬레이터 및 .xlsx 데이터 연동 탐구 과제</p>
+                                <p class="text-xs text-notion-textSecondary mt-0.5">시뮬레이터를 통해 평상시, 엘니뇨, 라니냐 상태의 수온 분포와 수온약층 깊이를 관찰하고 3단계에서 엑셀을 업로드하세요.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-2 p-2 hover:bg-notion-sidebar rounded transition cursor-pointer">
+                            <span class="text-xs bg-notion-blueBg text-notion-blueText px-2 py-0.5 rounded font-medium mt-0.5">일정</span>
+                            <div>
+                                <p class="font-medium text-notion-textPrimary">탐구 보고서 최종 제출 안내</p>
+                                <p class="text-xs text-notion-textSecondary mt-0.5">[과제 제출] 탭에서 작성 완료 후 제출 버튼을 누르면 교사 대시보드로 실시간 전달됩니다.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="notion-card p-4 bg-notion-sidebar">
+                    <h3 class="font-bold text-sm text-notion-textPrimary mb-3 flex items-center gap-1.5">
+                        <span>🗓️</span> 탐구 일정
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex justify-between items-center pb-2 border-b border-notion-border">
+                            <span class="text-notion-textSecondary">1차시: 개념 이해 & 영상 시청</span>
+                            <span class="text-green-600 font-semibold">완료</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-notion-border">
+                            <span class="font-medium text-notion-textPrimary">2차시: 시뮬레이션 및 데이터 분석</span>
+                            <span class="text-blue-600 font-semibold">진행 중</span>
+                        </div>
+                        <div class="flex justify-between items-center pb-2 border-b border-notion-border">
+                            <span class="text-notion-textSecondary">3차시: 보고서 작성 및 제출</span>
+                            <span class="text-notion-textSecondary">예정</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-8">
+                <h3 class="text-lg font-bold text-notion-textPrimary mb-4 flex items-center gap-2">
+                    <span>🔍</span> 탐구 주요 키워드
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="notion-card p-4 hover:border-blue-300">
+                        <div class="text-2xl mb-2">💨</div>
+                        <h4 class="font-semibold text-notion-textPrimary text-base mb-1">무역풍 (Trade Winds)</h4>
+                        <p class="text-xs text-notion-textSecondary leading-relaxed">
+                            열대 해역에서 적도를 향해 동에서 서쪽으로 부는 바람. 표층 해수를 서태평양으로 이동시키는 핵심 구동력입니다.
+                        </p>
+                    </div>
+                    <div class="notion-card p-4 hover:border-orange-300">
+                        <div class="text-2xl mb-2">🌡️</div>
+                        <h4 class="font-semibold text-notion-textPrimary text-base mb-1">수온약층 (Thermocline)</h4>
+                        <p class="text-xs text-notion-textSecondary leading-relaxed">
+                            수심이 깊어짐에 따라 수온이 급격히 낮아지는 경계층. 무역풍의 세기에 따라 기울기와 수심이 달라집니다.
+                        </p>
+                    </div>
+                    <div class="notion-card p-4 hover:border-green-300">
+                        <div class="text-2xl mb-2">🌊</div>
+                        <h4 class="font-semibold text-notion-textPrimary text-base mb-1">용승 현상 (Upwelling)</h4>
+                        <p class="text-xs text-notion-textSecondary leading-relaxed">
+                            동태평양 연안에서 표층수가 서쪽으로 떠나면, 심해의 차갑고 영양염류가 풍부한 해수가 위로 솟아오르는 현상입니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-guide" class="hidden space-y-6">
+            <div class="notion-card p-6">
+                <h2 class="text-xl font-bold text-notion-textPrimary mb-4 flex items-center gap-2">
+                    <span>🧭</span> 단계별 탐구 학습 경로
+                </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+                    <button onclick="showGuideStep(1)" id="guide-btn-1" class="guide-step-btn border border-notion-border p-3 rounded-lg text-left hover:bg-notion-sidebar transition bg-notion-blueBg border-blue-300">
+                        <span class="text-xs font-bold text-notion-blueText block mb-1">1단계</span>
+                        <span class="text-sm font-semibold text-notion-textPrimary">개념 파악 및 가설 설정</span>
+                    </button>
+                    <button onclick="showGuideStep(2)" id="guide-btn-2" class="guide-step-btn border border-notion-border p-3 rounded-lg text-left hover:bg-notion-sidebar transition">
+                        <span class="text-xs font-bold text-notion-textSecondary block mb-1">2단계</span>
+                        <span class="text-sm font-semibold text-notion-textPrimary">데이터 수집 (.xlsx)</span>
+                    </button>
+                    <button onclick="showGuideStep(3)" id="guide-btn-3" class="guide-step-btn border border-notion-border p-3 rounded-lg text-left hover:bg-notion-sidebar transition">
+                        <span class="text-xs font-bold text-notion-textSecondary block mb-1">3단계</span>
+                        <span class="text-sm font-semibold text-notion-textPrimary">데이터 분석 및 시각화</span>
+                    </button>
+                    <button onclick="showGuideStep(4)" id="guide-btn-4" class="guide-step-btn border border-notion-border p-3 rounded-lg text-left hover:bg-notion-sidebar transition">
+                        <span class="text-xs font-bold text-notion-textSecondary block mb-1">4단계</span>
+                        <span class="text-sm font-semibold text-notion-textPrimary">보고서 작성 및 제출</span>
+                    </button>
+                </div>
+
+                <div id="guide-content-box" class="p-4 bg-notion-bg rounded-lg border border-notion-border text-sm leading-relaxed">
+                    <h3 class="font-bold text-base text-notion-textPrimary mb-2 flex items-center gap-2" id="guide-title">
+                        <span>💡</span> 1단계: 개념 파악 및 탐구 가설 설정
+                    </h3>
+                    <p class="text-notion-textSecondary mb-3" id="guide-desc">
+                        평상시 태평양의 해수 순환과 무역풍의 관계를 정리하고, 무역풍의 세기가 약해지거나 강해졌을 때 환경 변화 가설을 작성해보세요.
+                    </p>
+                    <div id="guide-action-container" class="mb-3 hidden"></div>
+                    <div class="bg-white p-3 rounded border border-notion-border" id="guide-checklist-box">
+                        <span class="font-semibold text-xs text-notion-textPrimary block mb-1">체크리스트:</span>
+                        <ul class="list-disc list-inside text-xs text-notion-textSecondary space-y-1">
+                            <li>무역풍이 태평양 표층 해수에 미치는 역할 이해하기</li>
+                            <li>워커 순환(Walker Circulation)의 상승 기류 및 하강 기류 발생 지역 확인하기</li>
+                            <li>가설 작성 예시: "무역풍이 약해지면 동태평양의 수온이 상승하여 홍수가 발생할 것이다."</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="data-analysis-section" class="notion-card p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-notion-border pb-3">
+                    <div>
+                        <h3 class="font-bold text-base text-notion-textPrimary flex items-center gap-2">
+                            <span>📈</span> 실습 데이터 (.xlsx) 파일 업로드 및 자동 그래프 생성
+                        </h3>
+                        <p class="text-xs text-notion-textSecondary mt-0.5">
+                            2단계에서 다운로드한 엑셀 파일 또는 가공 데이터를 업로드하여 수온 및 수온약층 변화를 분석하세요.
+                        </p>
+                    </div>
+                    <div>
+                        <label for="excel-upload-input" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded text-xs font-semibold transition cursor-pointer shadow-sm">
+                            <i class="fa-solid fa-file-excel"></i> .xlsx 파일 업로드
+                        </label>
+                        <input type="file" id="excel-upload-input" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(event)" class="hidden">
+                    </div>
+                </div>
+
+                <div id="no-data-placeholder" class="p-8 text-center bg-notion-sidebar rounded-lg border border-dashed border-notion-border">
+                    <div class="text-3xl mb-2 text-notion-textSecondary">📂</div>
+                    <p class="text-sm font-semibold text-notion-textPrimary">업로드된 분석 데이터가 없습니다.</p>
+                    <p class="text-xs text-notion-textSecondary mt-1">상단의 [.xlsx 파일 업로드] 버튼을 누르거나 2단계 [샘플 .xlsx 다운로드]를 클릭해 테스트해보세요.</p>
+                </div>
+
+                <div id="parsed-data-container" class="hidden space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-lg border border-notion-border shadow-sm">
+                            <h4 class="text-xs font-bold text-notion-textPrimary mb-2 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-orange-500"></span> 서태평양 vs 동태평양 수온 추이 (°C)
+                            </h4>
+                            <div class="h-56 relative">
+                                <canvas id="chart-temp"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="bg-white p-4 rounded-lg border border-notion-border shadow-sm">
+                            <h4 class="text-xs font-bold text-notion-textPrimary mb-2 flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> 동태평양 수온약층 깊이 변화 (m)
+                            </h4>
+                            <div class="h-56 relative">
+                                <canvas id="chart-thermocline"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-notion-blueBg border border-blue-200 rounded-lg p-4">
+                        <div class="flex items-center justify-between mb-2">
+                            <h4 class="font-bold text-sm text-notion-blueText flex items-center gap-1.5">
+                                <span>🤖</span> 데이터 자동 분석 인사이트
+                            </h4>
+                            <button onclick="autoMapToSubmission()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded font-medium transition shadow-sm flex items-center gap-1">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> 보고서에 자동 반영하기
+                            </button>
+                        </div>
+                        <div id="auto-insight-text" class="text-xs text-notion-textPrimary leading-relaxed space-y-1"></div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-lg border border-notion-border">
+                        <h4 class="font-bold text-xs text-notion-textPrimary mb-2">📊 업로드 데이터 미리보기</h4>
+                        <div class="overflow-x-auto max-h-48">
+                            <table id="excel-data-table" class="w-full text-xs text-left border-collapse">
+                                <thead><tr class="bg-notion-sidebar border-b border-notion-border text-notion-textPrimary font-semibold"></tr></thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-sim" class="hidden space-y-6">
+            <div class="notion-card p-4 sm:p-6">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 border-b border-notion-border pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-notion-textPrimary flex items-center gap-2">
+                            <span>🎮</span> 무역풍 조절 실시간 엘니뇨/라니냐 시뮬레이터
+                        </h2>
+                        <p class="text-xs text-notion-textSecondary mt-1">
+                            슬라이더를 조작하여 무역풍 세기, 수온약층 경사, 상승/하강 기류 위치의 변화를 관찰하세요.
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-1.5 self-start sm:self-auto">
+                        <button onclick="setPreset(15)" class="px-2.5 py-1 text-xs rounded border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 font-medium transition">
+                            🔥 엘니뇨 (약함)
+                        </button>
+                        <button onclick="setPreset(50)" class="px-2.5 py-1 text-xs rounded border border-gray-200 bg-gray-50 text-gray-700 hover:bg-gray-100 font-medium transition">
+                            ⚖️ 평상시 (보통)
+                        </button>
+                        <button onclick="setPreset(85)" class="px-2.5 py-1 text-xs rounded border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 font-medium transition">
+                            ❄️ 라니냐 (강함)
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-notion-sidebar p-4 rounded-lg border border-notion-border mb-4 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <label for="wind-slider" class="text-sm font-semibold text-notion-textPrimary flex items-center gap-2">
+                            <span>💨</span> 무역풍 세기 조절:
+                            <span id="wind-val-text" class="text-blue-600 font-bold">50% (평상시)</span>
+                        </label>
+                        <span id="status-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800 self-start sm:self-auto">
+                            상태: 평상시 (Normal)
+                        </span>
+                    </div>
+                    <input type="range" id="wind-slider" min="0" max="100" value="50" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                    <div class="flex justify-between text-[11px] text-notion-textSecondary font-medium px-1">
+                        <span>← 무역풍 매우 약함 (엘니뇨)</span>
+                        <span>보통</span>
+                        <span>무역풍 매우 강함 (라니냐) →</span>
+                    </div>
+                </div>
+
+                <div class="relative w-full bg-slate-900 rounded-lg overflow-hidden shadow-inner border border-slate-700" style="min-height: 360px;">
+                    <canvas id="simCanvas" class="w-full h-[360px] block"></canvas>
+                    
+                    <div class="absolute top-3 left-3 bg-slate-800/80 backdrop-blur text-white text-xs px-2.5 py-1 rounded border border-slate-600 flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-red-400"></span> 서태평양 (인도네시아/호주)
+                    </div>
+                    <div class="absolute top-3 right-3 bg-slate-800/80 backdrop-blur text-white text-xs px-2.5 py-1 rounded border border-slate-600 flex items-center gap-1.5">
+                        <span class="inline-block w-2 h-2 rounded-full bg-blue-400"></span> 동태평양 (남미/페루 연안)
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div class="notion-card p-4 border-l-4 border-l-orange-400">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-sm text-notion-textPrimary">🌏 서태평양 환경 상태</h4>
+                            <span id="west-temp-tag" class="text-xs font-semibold px-2 py-0.5 rounded bg-orange-100 text-orange-800">고수온 유지</span>
+                        </div>
+                        <ul class="text-xs text-notion-textSecondary space-y-1.5">
+                            <li><b>해수면 수온:</b> <span id="west-temp-val">약 28°C ~ 30°C (높음)</span></li>
+                            <li><b>대기 순환:</b> <span id="west-air-val">강한 상승 기류 발생 (적운형 구름)</span></li>
+                            <li><b>기상 현상:</b> <span id="west-weather-val">풍부한 강수, 집중호우 및 따뜻한 기후</span></li>
+                            <li><b>생태계 영향:</b> <span id="west-eco-val">풍부한 산호초 및 정상 해양 생태계</span></li>
+                        </ul>
+                    </div>
+
+                    <div class="notion-card p-4 border-l-4 border-l-blue-400">
+                        <div class="flex justify-between items-start mb-2">
+                            <h4 class="font-bold text-sm text-notion-textPrimary">🌎 동태평양 환경 상태</h4>
+                            <span id="east-temp-tag" class="text-xs font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-800">저수온 (용승)</span>
+                        </div>
+                        <ul class="text-xs text-notion-textSecondary space-y-1.5">
+                            <li><b>해수면 수온:</b> <span id="east-temp-val">약 20°C ~ 22°C (차가움)</span></li>
+                            <li><b>대기 순환:</b> <span id="east-air-val">하강 기류 형성 (건조한 공기)</span></li>
+                            <li><b>기상 현상:</b> <span id="east-weather-val">맑고 건조한 날씨, 적은 강수량</span></li>
+                            <li><b>생태계 영향:</b> <span id="east-eco-val">찬 해수의 영양염류 용승으로 좋은 어장 형성</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-resources" class="hidden space-y-6">
+            <div class="notion-card p-6">
+                <h2 class="text-xl font-bold text-notion-textPrimary mb-4 flex items-center gap-2">
+                    <span>🎬</span> 시각 학습 자료 및 멀티미디어
+                </h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <div class="relative w-full pt-[56.25%] bg-black rounded-lg overflow-hidden shadow">
+                            <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube-nocookie.com/embed/wVlft88C158" title="El Nino Explanation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <p class="text-xs font-semibold text-notion-textPrimary mt-1">[참고 영상] 엘니뇨와 라니냐 발생 메커니즘 3분 정복</p>
+                    </div>
+
+                    <div class="space-y-3 text-sm">
+                        <h3 class="font-bold text-notion-textPrimary flex items-center gap-1.5">
+                            <span>📄</span> 필수 읽기 자료
+                        </h3>
+                        <div class="notion-card p-3 hover:bg-notion-sidebar transition cursor-pointer flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">📊</span>
+                                <div>
+                                    <p class="font-medium text-xs text-notion-textPrimary">기상청 해수면 수온 데이터 수치 해석 가이드</p>
+                                    <p class="text-[11px] text-notion-textSecondary">PDF Document · 1.2 MB</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-down-long text-xs text-notion-textSecondary"></i>
+                        </div>
+
+                        <div class="notion-card p-3 hover:bg-notion-sidebar transition cursor-pointer flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <span class="text-xl">🐠</span>
+                                <div>
+                                    <p class="font-medium text-xs text-notion-textPrimary">남미 어장 어획량 변화로 보는 생태계 리포트</p>
+                                    <p class="text-[11px] text-notion-textSecondary">NOAA 번역 보고서</p>
+                                </div>
+                            </div>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs text-notion-textSecondary"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="content-submit" class="hidden space-y-6">
+            <div class="notion-card p-6">
+                <div class="flex items-center justify-between mb-1">
+                    <h2 class="text-xl font-bold text-notion-textPrimary flex items-center gap-2">
+                        <span>📝</span> 탐구 결과 분석 보고서 제출
+                    </h2>
+                    <span id="auto-mapped-badge" class="hidden text-xs bg-purple-100 text-purple-700 font-semibold px-2.5 py-0.5 rounded-full border border-purple-200">
+                        ⚡ 엑셀 데이터 분석 자동 매핑됨
+                    </span>
+                </div>
+                <p class="text-xs text-notion-textSecondary mb-6">
+                    시뮬레이터 관찰 및 엑셀 데이터 분석 결과를 바탕으로 답변을 작성한 후 제출 버튼을 클릭하세요.
+                </p>
+
+                <form id="report-form" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-notion-textPrimary mb-1">학번 및 이름</label>
+                            <input type="text" id="student-info" required placeholder="예: 10101 홍길동" class="w-full text-xs p-2.5 rounded border border-notion-border focus:outline-none focus:border-blue-500 bg-notion-bg">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-notion-textPrimary mb-1">탐구 모둠명</label>
+                            <input type="text" id="team-info" required placeholder="예: 지구수호대 3모둠" class="w-full text-xs p-2.5 rounded border border-notion-border focus:outline-none focus:border-blue-500 bg-notion-bg">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-notion-textPrimary mb-1">Q1. 무역풍 세기 감소 시(엘니뇨 발생 시) 동태평양 수온 및 수온약층 변화 분석</label>
+                        <textarea id="q1-ans" rows="3" required placeholder="시뮬레이터 관찰 및 엑셀 데이터 분석 결과를 적어주세요..." class="w-full text-xs p-2.5 rounded border border-notion-border focus:outline-none focus:border-blue-500 bg-notion-bg transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-notion-textPrimary mb-1">Q2. 엘니뇨가 동태평양 및 서태평양 연안 기상 현상에 미치는 영향 비교</label>
+                        <textarea id="q2-ans" rows="3" required placeholder="서태평양 가뭄/화재 위험, 동태평양 홍수/폭우 현상 등..." class="w-full text-xs p-2.5 rounded border border-notion-border focus:outline-none focus:border-blue-500 bg-notion-bg transition"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-notion-textPrimary mb-1">Q3. 엘니뇨 현상이 동태평양 해양 생태계(어장)에 미치는 영향과 결론</label>
+                        <textarea id="q3-ans" rows="3" required placeholder="영양염류 공급 감소, 어획량 감소 등 생태계 파급 효과 서술..." class="w-full text-xs p-2.5 rounded border border-notion-border focus:outline-none focus:border-blue-500 bg-notion-bg transition"></textarea>
+                    </div>
+
+                    <div class="pt-2 flex justify-end">
+                        <button type="submit" class="w-full sm:w-auto bg-[#37352f] hover:bg-[#252420] text-white font-medium px-6 py-2.5 rounded text-xs transition shadow-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-paper-plane"></i> 보고서 제출 완료하기
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-notion-border bg-[#fbfbfa] py-6 px-4 mt-12 text-center text-xs text-notion-textSecondary">
+        <p class="font-medium text-notion-textPrimary">고등학교 1학년 지구과학 탐구 프로젝트 · 엘니뇨와 지구 환경</p>
+    </footer>
+
+    <div id="toast-msg" class="fixed bottom-5 right-5 bg-slate-800 text-white text-xs px-4 py-3 rounded-lg shadow-lg hidden transition-opacity opacity-0 z-50 flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-green-400"></i>
+        <span id="toast-text">보고서가 성공적으로 제출되었습니다!</span>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDru7ruqgOTFe-OaUeGnLNdB6tp0gUiTnk",
+            authDomain: "el-nino-a.firebaseapp.com",
+            projectId: "el-nino-a",
+            storageBucket: "el-nino-a.firebasestorage.app",
+            messagingSenderId: "537066761031",
+            appId: "1:537066761031:web:2055495f14f99fe9d1fa62",
+            measurementId: "G-N080WNM3LQ"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'el-nino-a';
+        let currentUser = null;
+
+        async function initAuth() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (err) {
+                console.warn("Firebase Auth fallback active:", err.message);
+            }
+        }
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) currentUser = user;
+        });
+
+        initAuth();
+
+        window.submitReportToFirebase = async (submissionData) => {
+            try {
+                const subCollection = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+                await addDoc(subCollection, {
+                    ...submissionData,
+                    createdAtMs: Date.now(),
+                    userId: currentUser ? currentUser.uid : ('anon_' + Date.now())
+                });
+                return true;
+            } catch (err) {
+                console.warn("Firestore save failed, fallback to local:", err);
+                return false;
+            }
+        };
+    </script>
+
+    <script>
+        let chartTempInstance = null;
+        let chartThermoclineInstance = null;
+        let currentParsedAnalysis = null;
+
+        function switchTab(tabId) {
+            const tabs = ['main', 'guide', 'sim', 'resources', 'submit'];
+            tabs.forEach(t => {
+                const content = document.getElementById(`content-${t}`);
+                const btn = document.getElementById(`tab-${t}`);
+                if (content) content.classList.add('hidden');
+                if (btn) btn.classList.remove('active');
+            });
+
+            const activeContent = document.getElementById(`content-${tabId}`);
+            const activeBtn = document.getElementById(`tab-${tabId}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+            if (activeBtn) activeBtn.classList.add('active');
+
+            if (tabId === 'sim') {
+                setTimeout(resizeCanvas, 50);
+            }
+        }
+
+        function scrollToReport() { 
+            switchTab('submit'); 
+            setTimeout(() => {
+                const formEl = document.getElementById('report-form');
+                if (formEl) formEl.scrollIntoView({ behavior: 'smooth' });
+            }, 100);
+        }
+
+        function downloadSampleExcel() {
+            const sampleData = [
+                { "시기(연도/상태)": "2020년 (평상시)", "서태평양 수온(°C)": 29.5, "동태평양 수온(°C)": 21.2, "동태평양 수온약층 깊이(m)": 40 },
+                { "시기(연도/상태)": "2021년 (평상시)", "서태평양 수온(°C)": 29.2, "동태평양 수온(°C)": 21.8, "동태평양 수온약층 깊이(m)": 45 },
+                { "시기(연도/상태)": "2023년 (엘니뇨 발생)", "서태평양 수온(°C)": 26.1, "동태평양 수온(°C)": 27.8, "동태평양 수온약층 깊이(m)": 95 },
+                { "시기(연도/상태)": "2024년 (엘니뇨 지속)", "서태평양 수온(°C)": 25.8, "동태평양 수온(°C)": 28.2, "동태평양 수온약층 깊이(m)": 110 },
+                { "시기(연도/상태)": "2025년 (라니냐 전환)", "서태평양 수온(°C)": 30.8, "동태평양 수온(°C)": 18.2, "동태평양 수온약층 깊이(m)": 20 }
+            ];
+            const worksheet = XLSX.utils.json_to_sheet(sampleData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "엘니뇨_수온데이터");
+            XLSX.writeFile(workbook, "엘니뇨_해수온도_탐구데이터.xlsx");
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                try {
+                    const data = new Uint8Array(evt.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheet = workbook.SheetNames[0];
+                    const jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[firstSheet]);
+
+                    if (jsonData.length === 0) {
+                        alert("엑셀 파일에 데이터가 존재하지 않습니다.");
+                        return;
+                    }
+
+                    renderParsedCharts(jsonData);
+                    renderTablePreview(jsonData);
+                    document.getElementById('no-data-placeholder').classList.add('hidden');
+                    document.getElementById('parsed-data-container').classList.remove('hidden');
+                } catch (err) {
+                    alert("엑셀 파일(.xlsx) 읽기 오류가 발생했습니다.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function renderParsedCharts(data) {
+            const labels = data.map((d, i) => d["시기(연도/상태)"] || d["연도"] || d["시기"] || `데이터 #${i+1}`);
+            const westTemp = data.map(d => parseFloat(d["서태평양 수온(°C)"] || d["서태평양수온"] || 0));
+            const eastTemp = data.map(d => parseFloat(d["동태평양 수온(°C)"] || d["동태평양수온"] || 0));
+            const thermocline = data.map(d => parseFloat(d["동태평양 수온약층 깊이(m)"] || d["수온약층깊이"] || 0));
+
+            const ctx1 = document.getElementById('chart-temp').getContext('2d');
+            if (chartTempInstance) chartTempInstance.destroy();
+            chartTempInstance = new Chart(ctx1, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: '서태평양 수온 (°C)', data: westTemp, borderColor: '#f97316', backgroundColor: '#f9731622', tension: 0.3, fill: true },
+                        { label: '동태평양 수온 (°C)', data: eastTemp, borderColor: '#3b82f6', backgroundColor: '#3b82f622', tension: 0.3, fill: true }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            const ctx2 = document.getElementById('chart-thermocline').getContext('2d');
+            if (chartThermoclineInstance) chartThermoclineInstance.destroy();
+            chartThermoclineInstance = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: '동태평양 수온약층 깊이 (m)', data: thermocline, backgroundColor: '#0284c7' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { reverse: true } } }
+            });
+
+            const maxEastTempIdx = eastTemp.indexOf(Math.max(...eastTemp));
+            const elNinoPeriod = labels[maxEastTempIdx];
+            const maxThermocline = Math.max(...thermocline);
+
+            currentParsedAnalysis = {
+                insightQ1: `[${elNinoPeriod}] 시기 동태평양 수온이 최고 ${eastTemp[maxEastTempIdx]}°C로 높아지고 수온약층 깊이는 ${maxThermocline}m까지 깊어졌습니다. 이는 무역풍 약화로 따뜻한 표층 해수가 동쪽으로 이동했음을 뜻합니다.`,
+                insightQ2: `동태평양 수온 상승 지역에는 강한 상승 기류로 폭우/홍수가 야기되었고, 서태평양 지역은 하강 기류 형성으로 가뭄 및 산불 위험이 심화되었습니다.`,
+                insightQ3: `동태평양 수온약층이 깊어짐에 따라 영양염류 용승(Upwelling)이 차단되어 어장 생태계 및 수산 자원에 큰 영향을 주었습니다.`
+            };
+
+            document.getElementById('auto-insight-text').innerHTML = `
+                <p>• <b>엘니뇨 극대기:</b> <code>${elNinoPeriod}</code> (동태평양 최고 수온: <b>${eastTemp[maxEastTempIdx]}°C</b>)</p>
+                <p>• <b>수온약층 변화:</b> 최대 <b>${maxThermocline}m</b>로 하강하여 심해 용승 차단 현상 관찰</p>
+            `;
+        }
+
+        function renderTablePreview(data) {
+            const tbody = document.querySelector('#excel-data-table tbody');
+            const thead = document.querySelector('#excel-data-table thead tr');
+            tbody.innerHTML = '';
+            thead.innerHTML = '';
+            if (data.length === 0) return;
+
+            Object.keys(data[0]).forEach(key => {
+                const th = document.createElement('th');
+                th.className = "p-2 border-b border-notion-border";
+                th.textContent = key;
+                thead.appendChild(th);
+            });
+
+            data.slice(0, 5).forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "border-b border-notion-border";
+                Object.values(row).forEach(val => {
+                    const td = document.createElement('td');
+                    td.className = "p-2";
+                    td.textContent = val;
+                    tr.appendChild(td);
+                });
+                tbody.appendChild(tr);
+            });
+        }
+
+        function autoMapToSubmission() {
+            if (!currentParsedAnalysis) return alert("먼저 .xlsx 파일을 업로드하세요.");
+            document.getElementById('q1-ans').value = currentParsedAnalysis.insightQ1;
+            document.getElementById('q2-ans').value = currentParsedAnalysis.insightQ2;
+            document.getElementById('q3-ans').value = currentParsedAnalysis.insightQ3;
+            document.getElementById('auto-mapped-badge').classList.remove('hidden');
+            switchTab('submit');
+        }
+
+        function showGuideStep(stepNum) {
+            const guideBtns = document.querySelectorAll('.guide-step-btn');
+            guideBtns.forEach(btn => {
+                btn.classList.remove('bg-notion-blueBg', 'border-blue-300');
+                const badge = btn.querySelector('span:first-child');
+                if (badge) badge.className = "text-xs font-bold text-notion-textSecondary block mb-1";
+            });
+
+            const activeBtn = document.getElementById(`guide-btn-${stepNum}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-notion-blueBg', 'border-blue-300');
+                const badge = activeBtn.querySelector('span:first-child');
+                if (badge) badge.className = "text-xs font-bold text-notion-blueText block mb-1";
+            }
+
+            const titleEl = document.getElementById('guide-title');
+            const descEl = document.getElementById('guide-desc');
+            const actionContainer = document.getElementById('guide-action-container');
+            actionContainer.innerHTML = ''; actionContainer.classList.add('hidden');
+
+            if (stepNum === 1) {
+                titleEl.innerHTML = `<span>💡</span> 1단계: 개념 파악 및 탐구 가설 설정`;
+                descEl.textContent = `무역풍 세기 변화에 따른 태평양 해수 순환 및 기상 변화 가설을 작성하세요.`;
+            } else if (stepNum === 2) {
+                titleEl.innerHTML = `<span>📥</span> 2단계: 실험 데이터 수집 (.xlsx 다운로드)`;
+                descEl.textContent = `실습용 해수온도 및 수온약층 데이터 샘플(.xlsx)을 다운로드하세요.`;
+                actionContainer.classList.remove('hidden');
+                actionContainer.innerHTML = `
+                    <button onclick="downloadSampleExcel()" class="bg-green-700 hover:bg-green-800 text-white text-xs px-3.5 py-2 rounded font-semibold transition">
+                        <i class="fa-solid fa-file-excel mr-1"></i> 샘플 .xlsx 다운로드
+                    </button>`;
+            } else if (stepNum === 3) {
+                titleEl.innerHTML = `<span>📈</span> 3단계: 데이터 분석 및 시각화`;
+                descEl.textContent = `2단계 엑셀 파일을 아래 분석란에 업로드하면 그래프가 자동 그려집니다.`;
+            } else if (stepNum === 4) {
+                titleEl.innerHTML = `<span>✍️</span> 4단계: 과제 제출 및 피드백`;
+                descEl.textContent = `시뮬레이션 관찰과 엑셀 분석 결과를 정리해 과제를 제출하세요.`;
+            }
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const student = document.getElementById('student-info').value.trim();
+            const team = document.getElementById('team-info').value.trim();
+            const q1 = document.getElementById('q1-ans').value.trim();
+            const q2 = document.getElementById('q2-ans').value.trim();
+            const q3 = document.getElementById('q3-ans').value.trim();
+
+            if (!student || !team || !q1 || !q2 || !q3) {
+                alert("모든 입력란(학번/이름, 모둠명, Q1~Q3 답안)을 작성하신 후 제출해 주세요.");
+                return;
+            }
+
+            const submissionData = {
+                student: student,
+                team: team,
+                q1: q1,
+                q2: q2,
+                q3: q3,
+                timestamp: new Date().toLocaleString('ko-KR'),
+                isAutoMapped: !document.getElementById('auto-mapped-badge').classList.contains('hidden')
+            };
+
+            let success = false;
+            if (window.submitReportToFirebase) {
+                success = await window.submitReportToFirebase(submissionData);
+            }
+
+            if (!success) {
+                const list = JSON.parse(localStorage.getItem('el_nino_submissions') || '[]');
+                list.unshift({ id: Date.now(), ...submissionData });
+                localStorage.setItem('el_nino_submissions', JSON.stringify(list));
+            }
+
+            document.getElementById('report-form').reset();
+            document.getElementById('auto-mapped-badge').classList.add('hidden');
+
+            const toast = document.getElementById('toast-msg');
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.remove('opacity-0'), 10);
+            setTimeout(() => {
+                toast.classList.add('opacity-0');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const windSlider = document.getElementById('wind-slider');
+
+        function resizeCanvas() {
+            if (!canvas || !canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 360;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function setPreset(val) {
+            windSlider.value = val;
+            updateSimulationInfo(val);
+        }
+
+        windSlider.addEventListener('input', (e) => updateSimulationInfo(e.target.value));
+
+        function updateSimulationInfo(val) {
+            const windValText = document.getElementById('wind-val-text');
+            const badge = document.getElementById('status-badge');
+
+            if (val < 35) {
+                windValText.textContent = `${val}% (매우 약함)`;
+                badge.textContent = "상태: 엘니뇨 (El Niño)";
+                badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-red-100 text-red-800";
+
+                document.getElementById('west-temp-val').textContent = "약 24°C ~ 26°C (낮음)";
+                document.getElementById('west-air-val').textContent = "하강 기류 형성 (건조)";
+                document.getElementById('west-weather-val').textContent = "가뭄, 산불 위험 증대";
+
+                document.getElementById('east-temp-val').textContent = "약 26°C ~ 28°C (매우 높음)";
+                document.getElementById('east-air-val').textContent = "강한 상승 기류 (적운/폭우)";
+                document.getElementById('east-weather-val').textContent = "폭우, 홍수, 산사태 발생";
+            } else if (val > 65) {
+                windValText.textContent = `${val}% (강함)`;
+                badge.textContent = "상태: 라니냐 (La Niña)";
+                badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800";
+
+                document.getElementById('west-temp-val').textContent = "약 30°C 이상 (초고수온)";
+                document.getElementById('west-air-val').textContent = "강력한 상승 기류 (집중호우)";
+                document.getElementById('west-weather-val').textContent = "기습 폭우 및 열대성 저기압";
+
+                document.getElementById('east-temp-val').textContent = "약 16°C ~ 18°C (강한 차가움)";
+                document.getElementById('east-air-val').textContent = "강한 하강 기류 (건조)";
+                document.getElementById('east-weather-val').textContent = "가뭄 및 저온 현상";
+            } else {
+                windValText.textContent = `${val}% (평상시)`;
+                badge.textContent = "상태: 평상시 (Normal)";
+                badge.className = "px-2.5 py-0.5 rounded-full text-xs font-bold bg-green-100 text-green-800";
+
+                document.getElementById('west-temp-val').textContent = "약 28°C ~ 30°C (높음)";
+                document.getElementById('west-air-val').textContent = "상승 기류 발생 (적운 구름)";
+                document.getElementById('west-weather-val').textContent = "풍부한 강수, 따뜻한 기후";
+
+                document.getElementById('east-temp-val').textContent = "약 20°C ~ 22°C (차가움)";
+                document.getElementById('east-air-val').textContent = "하강 기류 형성 (건조)";
+                document.getElementById('east-weather-val').textContent = "맑고 건조한 날씨";
+            }
+        }
+
+        function renderSim() {
+            const width = canvas.width;
+            const height = canvas.height;
+            const windVal = parseInt(windSlider.value);
+            const isElNino = windVal < 35;
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Sky
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, 180);
+            skyGrad.addColorStop(0, '#0f172a'); skyGrad.addColorStop(1, '#1e293b');
+            ctx.fillStyle = skyGrad; ctx.fillRect(0, 0, width, 180);
+
+            // Sea & Thermocline
+            const seaLevelY = 160;
+            const westThermoclineY = seaLevelY + (30 + (windVal / 100) * 80);
+            const eastThermoclineY = seaLevelY + Math.max(10, 90 - (windVal / 100) * 80);
+
+            const deepGrad = ctx.createLinearGradient(0, seaLevelY, 0, height);
+            deepGrad.addColorStop(0, '#1e3a8a'); deepGrad.addColorStop(1, '#0284c7');
+            ctx.fillStyle = deepGrad; ctx.fillRect(0, seaLevelY, width, height - seaLevelY);
+
+            const warmGrad = ctx.createLinearGradient(0, seaLevelY, width, seaLevelY);
+            warmGrad.addColorStop(0, 'rgba(239, 68, 68, 0.85)');
+            warmGrad.addColorStop(1, isElNino ? 'rgba(239, 68, 68, 0.8)' : 'rgba(59, 130, 246, 0.8)');
+
+            ctx.beginPath();
+            ctx.moveTo(0, seaLevelY); ctx.lineTo(width, seaLevelY);
+            ctx.lineTo(width, eastThermoclineY); ctx.lineTo(0, westThermoclineY);
+            ctx.closePath(); ctx.fillStyle = warmGrad; ctx.fill();
+
+            // Thermocline line
+            ctx.beginPath();
+            ctx.moveTo(0, westThermoclineY); ctx.lineTo(width, eastThermoclineY);
+            ctx.strokeStyle = '#facc15'; ctx.lineWidth = 3; ctx.stroke();
+
+            // Upwelling Arrows (East Pacific when Normal or La Nina)
+            if (windVal > 25) {
+                ctx.strokeStyle = '#bae6fd'; ctx.lineWidth = 2;
+                for (let x = width - 80; x < width - 20; x += 25) {
+                    ctx.beginPath(); ctx.moveTo(x, height - 20); ctx.lineTo(x, seaLevelY + 15); ctx.stroke();
+                }
+            }
+
+            // Trade Winds Direction:
+            // Normal/La Nina: East -> West (◄◄)
+            // El Nino: West -> East (►►)
+            const windY = 105;
+            const speed = isElNino ? 0.02 : 0.02 + (windVal / 100) * 0.04;
+            const dir = isElNino ? 1 : -1;
+            const offset = (Date.now() * speed * dir) % 70;
+
+            ctx.lineWidth = 2; ctx.strokeStyle = isElNino ? '#fca5a5' : '#93c5fd';
+            for (let x = -70; x < width + 70; x += 70) {
+                let curX = x + offset;
+                ctx.beginPath(); ctx.moveTo(curX, windY); ctx.lineTo(curX + (isElNino ? 20 : -20), windY); ctx.stroke();
+            }
+
+            // Clouds & Rain position based on Walker circulation
+            const cloudX = isElNino ? width * 0.70 : width * 0.25;
+            drawCloud(ctx, cloudX, 45, 1.1);
+
+            ctx.fillStyle = '#38bdf8';
+            for (let r = 0; r < 8; r++) {
+                let rx = cloudX - 20 + Math.random() * 40;
+                let ry = 65 + (Date.now() * 0.12 + r * 15) % 35;
+                ctx.fillRect(rx, ry, 2, 6);
+            }
+
+            requestAnimationFrame(renderSim);
+        }
+
+        function drawCloud(context, x, y, scale = 1.0) {
+            context.save();
+            context.translate(x, y); context.scale(scale, scale);
+            context.fillStyle = 'rgba(241, 245, 249, 0.9)';
+            context.beginPath();
+            context.arc(0, 0, 20, Math.PI * 0.5, Math.PI * 1.5);
+            context.arc(15, -15, 22, Math.PI * 1, Math.PI * 1.85);
+            context.arc(40, -10, 18, Math.PI * 1.3, Math.PI * 0.3);
+            context.arc(45, 0, 18, Math.PI * 1.7, Math.PI * 0.5);
+            context.closePath(); context.fill(); context.restore();
+        }
+
+        window.onload = function() {
+            resizeCanvas();
+            renderSim();
+            showGuideStep(1);
+        };
+    </script>
+</body>
+</html>
